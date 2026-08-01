@@ -1,4 +1,3 @@
-
 # CFG-cDDPM
 
 This is part of the original data set and test results of our research. The manuscript of the paper is being revised and will be indexed after its official publication.
