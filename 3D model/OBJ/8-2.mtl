@@ -1,0 +1,6 @@
+newmtl material_R
+Kd 1 0 0
+newmtl material_G
+Kd 0 1 0
+newmtl material_B
+Kd 0 0 1
