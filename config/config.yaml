@@ -1,0 +1,147 @@
+# configs/config.yaml
+root_dir: "./workspace"
+
+# ---------------- Data Paths ----------------
+data:
+  origin_train_dir: "${root_dir}/data/origin_train"
+  train_dir: "${root_dir}/data/train"
+  val_dir: "${root_dir}/data/val"
+  test_dir: "${root_dir}/data/test"
+  test_mask_dir: "${root_dir}/data/test/masks"
+
+meta:
+  origin_train_csv: "${root_dir}/data/origin_train/train_meta.csv"
+  test_meta_csv: "${root_dir}/data/test/test_meta.csv"
+
+# ---------------- Output Directory ----------------
+output_root: "${root_dir}/outputs"
+
+# ---------------- General Experiment Setup ----------------
+experiment:
+  run_name: "auto"
+  seed: 1
+
+# ---------------- Model Architecture ----------------
+model:
+  image_size: 256
+  channels: 3
+  base_channels: 64
+  cond_dim: 128
+
+# ---------------- Training Hyperparameters ----------------
+train:
+  batch_size: 16
+  epochs: 500
+  lr: 0.0002
+  timesteps: 2000
+  cond_drop_prob: 0.1
+  save_every_epochs: 100
+  log_interval: 1
+  val_split: 0.1
+  val_every_epochs: 1
+  resume_ckpt: null
+
+# ---------------- Sampling / Evaluation Setup ----------------
+sampling:
+  guidance_scale_utci: 3.0
+  guidance_scale_other: 1.0
+  samples_per_test_image: 1
+  utci_threshold_retry: 5
+
+# ---------------- Logging Options ----------------
+logging:
+  tensorboard: true
+  tb_logdir_name: "tb"
+  save_metrics_csv: true
+
+# ---------------- Hardware & Execution Utilities ----------------
+util:
+  num_workers: 4
+  clip_grad_norm: 1.0
+
+device: "cuda"
+
+# ---------------- Stage-Wise Masking Policies ----------------
+masks:
+  train:
+    mode: "hybrid"
+    center:
+      schedule:
+        type: "linear"
+        params:
+          center_scale:
+            start: 0.6
+            end: 0.6
+    random:
+      schedule:
+        type: "linear"
+        params:
+          random_ratio:
+            start: 0.2
+            end: 0.6
+    hybrid:
+      schedule:
+        type: "linear"
+        params:
+          hybrid_center:
+            start: 0.5
+            end: 0.5
+          hybrid_random:
+            start: 0.5
+            end: 0.5
+    self_mask_dir: "${root_dir}/data/train/masks"
+
+  val:
+    mode: "hybrid"
+    center:
+      schedule:
+        type: "linear"
+        params:
+          center_scale:
+            start: 0.5
+            end: 0.5
+    random:
+      schedule:
+        type: "linear"
+        params:
+          random_ratio:
+            start: 0.2
+            end: 0.6
+    hybrid:
+      schedule:
+        type: "linear"
+        params:
+          hybrid_center:
+            start: 0.5
+            end: 0.5
+          hybrid_random:
+            start: 0.5
+            end: 0.5
+    self_mask_dir: "${root_dir}/data/val/masks"
+
+  test:
+    mode: "hybrid"
+    center:
+      schedule:
+        type: "constant"
+        params:
+          center_scale:
+            value: 0.5
+    random:
+      schedule:
+        type: "constant"
+        params:
+          random_ratio:
+            value: 0.5
+    hybrid:
+      schedule:
+        type: "constant"
+        params:
+          hybrid_center:
+            value: 0.5
+          hybrid_random:
+            value: 0.25
+    self_mask_dir: "${root_dir}/data/test/masks"
+    invert_self_mask: false
+    dilate_px: 0
+    mask_threshold: 0
